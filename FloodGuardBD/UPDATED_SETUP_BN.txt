@@ -1,0 +1,74 @@
+FloodGuard BD - Updated Version
+================================
+
+এই version-এ নিচের feature যোগ/modify করা হয়েছে:
+
+1. Screenshot-এর মতো light dashboard UI.
+2. Header-এর search bar থেকে Bangladesh-এর district/area search.
+3. Search result click করলে map + risk analysis selected location-এ চলে যাবে.
+4. Use My GPS button থেকে current GPS location risk analysis.
+5. Map-এ click করলেও selected point analyze হবে.
+6. Automatic Highest Flood Risk Areas panel.
+7. Monitored districts-এর live weather থেকে risk score calculate করে Top 10 sort হয়.
+8. Top risk areas map-এ red/orange markers এবং risk circles হিসেবে দেখায়.
+9. Top risk area-তে click করলে সেই area-র full risk analysis load হয়.
+10. Existing shelter data ও nearest-shelter navigation রাখা হয়েছে.
+11. Existing SQLite database নষ্ট না করে নতুন districts table auto-create/seed হবে.
+12. Existing flood_logs ও shelters data রাখা হয়েছে.
+
+যে files replace করা হয়েছে:
+
+frontend/src/App.jsx
+frontend/src/index.css
+frontend/src/components/Header.jsx
+frontend/src/components/LeafletMap.jsx
+frontend/src/components/MetricCards.jsx
+frontend/src/components/RiskGauge.jsx
+frontend/src/components/HighRiskAreas.jsx   <-- NEW
+
+backend/app.py
+backend/database.py
+
+কীভাবে চালাবেন (Windows):
+
+1. Backend:
+   cd FloodGuardBD\\backend
+   python -m venv venv
+   venv\\Scripts\\activate
+   pip install -r requirements.txt
+   python app.py
+
+2. Frontend (নতুন terminal):
+   cd FloodGuardBD\\frontend
+   npm install
+   npm run dev
+
+3. Browser:
+   http://localhost:5173
+
+গুরুত্বপূর্ণ:
+- Browser-এ GPS permission Allow করতে হবে।
+- Search feature এবং weather data-এর জন্য internet connection দরকার।
+- Backend http://127.0.0.1:5000 এ চলবে।
+- Risk score এই project-এর existing rainfall + estimated water-level formula ভিত্তিক; এটি official disaster warning model নয়।
+- High-risk panel বর্তমানে seeded monitored district centres-এর live weather দিয়ে ranking করে।
+
+--- LIVE BWDB / FFWC DATA UPDATE ---
+এই ভার্সনে flood rainfall এবং river water-level synthetic/modelled নয়। Backend public FFWC/BWDB rainfall table এবং current river bulletin থেকে observed data নেয় এবং প্রতিটি dashboard refresh-এ SQLite-তে observation log করে।
+
+Data sources:
+- Rainfall: FFWC/BWDB public rainfall table
+- River water level + danger level: FFWC/BWDB current river bulletin
+- Temperature/humidity + precipitation forecast: Open-Meteo (supporting weather data)
+
+Auto refresh:
+- Selected-location flood data: প্রতি 2 মিনিট
+- High-risk monitored areas: প্রতি 5 মিনিট
+- Backend FFWC cache: 2 মিনিট
+
+Charts:
+- Recorded telemetry = fetched FFWC/BWDB gauge observations saved at refresh time
+- 24-hour dashed line = transparent simulation starting from observed gauge level + forecast precipitation; এটি official BWDB forecast নয়
+- 7-day rainfall bars = Open-Meteo precipitation forecast
+
+নোট: FFWC-এর developer API documentation registration-এর মাধ্যমে পাওয়া যায়। এই ZIP public FFWC/BWDB pages/bulletin adapter ব্যবহার করে, যাতে আলাদা API key ছাড়াই চলতে পারে। যদি ভবিষ্যতে official API credentials পাওয়া যায়, adapter-এ credentials বসিয়ে সরাসরি API mode করা যাবে।
