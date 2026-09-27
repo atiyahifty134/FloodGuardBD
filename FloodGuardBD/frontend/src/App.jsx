@@ -13,7 +13,9 @@ import ResourcesPage from './components/ResourcesPage.jsx';
 import Charts from './components/Charts.jsx';
 import { startSiren, stopSiren } from './utils/alarm.js';
 
-const API_BASE_URL = 'http://127.0.0.1:5000/api';
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://127.0.0.1:5000/api'
+  : 'https://floodguardbd.onrender.com/api';
 const POLL_INTERVAL_MS = 120000;
 const HIGH_RISK_POLL_MS = 300000;
 const DHAKA_FALLBACK = { lat: 23.8103, lng: 90.4125, name: 'Dhaka' };

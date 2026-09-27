@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-const API_BASE_URL = 'http://127.0.0.1:5000/api';
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://127.0.0.1:5000/api'
+  : 'https://floodguardbd.onrender.com/api';
 
 export default function Header({ isOnline, lastUpdated, onLocationSelect }) {
   const [query, setQuery] = useState('');
