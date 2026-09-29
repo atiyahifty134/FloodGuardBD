@@ -127,6 +127,7 @@ def fetch_weather_data(latitude, longitude, include_forecast=True):
         "current": "temperature_2m,relative_humidity_2m",
         "timezone": "Asia/Dhaka",
     }
+
     if include_forecast:
         params.update({
             "hourly": "precipitation",
@@ -134,14 +135,40 @@ def fetch_weather_data(latitude, longitude, include_forecast=True):
             "forecast_days": 7,
             "past_days": 1,
         })
+
     try:
-        response = requests.get(OPEN_METEO_URL, params=params, timeout=10)
+        response = requests.get(
+            OPEN_METEO_URL,
+            params=params,
+            timeout=30,
+            headers={
+                "User-Agent": "FloodGuardBD/1.0"
+            }
+        )
+
+        print(f"[WEATHER] Open-Meteo status: {response.status_code}")
+        print(f"[WEATHER] Open-Meteo URL: {response.url}")
+
         response.raise_for_status()
-        return response.json()
+
+        weather_json = response.json()
+
+        print("[WEATHER] Open-Meteo data received successfully.")
+
+        return weather_json
+
     except requests.RequestException as error:
-        print(f"[ERROR] Weather request failed for {latitude},{longitude}: {error}")
+        print(f"[WEATHER ERROR] {type(error).__name__}: {error}")
+
+        if 'response' in locals() and response is not None:
+            print(f"[WEATHER ERROR] Response status: {response.status_code}")
+            print(f"[WEATHER ERROR] Response body: {response.text[:500]}")
+
         return None
 
+    except ValueError as error:
+        print(f"[WEATHER ERROR] Invalid JSON from Open-Meteo: {error}")
+        return None
 
 def _download(url, timeout=15):
     response = requests.get(url, headers=FFWC_HEADERS, timeout=timeout)
